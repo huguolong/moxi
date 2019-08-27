@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8"/>
+<title>联粤</title>
+</head>
+<body>
+	<nav class="navbar-default navbar-static-side" role="navigation" th:fragment="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element"> 
+                    	<span>
+                            <img alt="" class="img-circle" th:src="@{/img/profile_small.jpg}" />
+						</span>
+                    	<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear"> 
+                            	<span class="block m-t-xs">
+                            		<strong class="font-bold">联粤服务管理平台</strong>
+                             	</span> 
+                             </span>
+                     	</a>
+                    </div>
+                    <div class="logo-element">
+                        	联粤
+                    </div>
+                </li>
+                <li>
+                    <a th:href="@{dashboard}"><i class="fa fa-diamond"></i> <span class="nav-label">首页</span></a>
+                </li>
+                <li id="analysis">
+                    <a href="#"><i class="fa fa-globe"></i> <span class="nav-label">统计分析</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                    	<li id="statisticsManage"><a th:href="@{statisticsManage_0_0_0}">营销统计</a></li>
+                    </ul>
+                </li>
+                
+                <li id="marketing">
+                    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">营销管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                    	<li id="applicationManage"><a th:href="@{applicationManage_0_0_0}">应用列表</a></li>
+                        <li id="channelManage"><a th:href="@{channelManage_0_0_0}">渠道列表</a></li>
+                    </ul>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>
+
+
+

@@ -1,0 +1,38 @@
+package com.moxi.mapper;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import com.moxi.domain.ActivationRecord;
+
+@Mapper
+public interface ActivationRecordMapper {
+	
+	@Select({
+		"<script>",
+		"SELECT COUNT(1) ",
+		"FROM activation_record a ",
+		"JOIN click_record c ON c.id = a.click_id ",
+		"WHERE c.app_id = #{appId} ",
+		"</script>"
+	})
+	int countActivationNum(String appId);
+
+	@Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
+	@Insert("INSERT INTO `activation_record` (`click_id`, `req_url`, `req_param`, `result`, `is_notice`, `create_time`) "
+			+ "VALUES (#{clickId}, #{reqUrl}, #{reqParam}, #{result}, #{isNotice}, #{createTime})")
+	int insert(ActivationRecord info);
+	
+	@Update("UPDATE `activation_record` SET `is_notice` = #{isNotice} WHERE id = #{id}")
+	int updateIsNotice(ActivationRecord activation);
+
+	@Update("UPDATE `activation_record` SET `is_notice` = #{isNotice},`result` = #{result}  WHERE id = #{id}")
+	int updateByResult(ActivationRecord activation);
+	
+	@Select("select * from activation_record where click_id = #{clickId}")
+	ActivationRecord findByClickIdOrIdfa(@Param("clickId")Integer clickId);
+}
