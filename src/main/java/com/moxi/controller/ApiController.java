@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import com.moxi.cache.AppRecallCache;
 import com.moxi.task.ReportToTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ public class ApiController {
 
 		return apiService.activationNotice(req);
 	}
+
 
 	public static void main(String[] args) throws Exception{
 		clickReportedBjjb();

@@ -28,10 +28,8 @@ public class ReportToTask {
     private ClickRecordMapper clickRecordMapper;
     @Resource
     private ActivationRecordMapper activationRecordMapper;
-
     @Autowired
     private AppRecallCache appRecallCache;
-
 
 
     @Async("taskExecutor")
@@ -57,6 +55,7 @@ public class ReportToTask {
     public void toUserPlatform(Integer clickId,Integer activionId){
         try {
             ClickRecord clickRecord = clickRecordMapper.findById(clickId);
+
             //判断该应用回调率
             boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(clickRecord.getAppId()));
             if(isCall){
@@ -77,16 +76,17 @@ public class ReportToTask {
                 activation.setId(activionId);
                 activation.setIsNotice(Integer.valueOf(Constant.Commons.TWO));
                 activationRecordMapper.updateByResult(activation);
+
             }
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     @Async("taskExecutor")
     public void testRecall(String appId){
         boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(appId));
         System.out.println(isCall);
     }
-
 }

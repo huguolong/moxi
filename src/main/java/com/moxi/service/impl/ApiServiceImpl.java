@@ -15,10 +15,7 @@ import com.moxi.model.BaseDataResp;
 import com.moxi.model.ButtReq;
 import com.moxi.service.IApiService;
 import com.moxi.common.config.Constant;
-
-
 import javax.annotation.Resource;
-
 import javax.servlet.http.HttpServletRequest;
 
 @Service
