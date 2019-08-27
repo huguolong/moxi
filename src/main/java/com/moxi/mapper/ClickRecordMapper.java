@@ -35,7 +35,6 @@ public interface ClickRecordMapper {
 	})
 	@Select("select * from click_record where id = #{id}")
 	ClickRecord findById(Integer id);
-	
 
 	@Select("select count(1) from click_record where app_id = #{appId}")
 	int count(String appId);

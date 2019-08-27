@@ -121,6 +121,7 @@
                                         </select>
                                     </div>
                                 </div>
+
                                 <div class="hr-line-dashed"></div>
 
                                 <div class="form-group"><label class="col-sm-2 control-label">回调率：</label>
@@ -190,10 +191,12 @@
 					toastr.error('请输入请求参数','提示');
 					return;
 				}
+
                 if($("#callbackRatio").val() == ""){
                     toastr.error('请输入回调率','提示');
                     return;
                 }
+
 				
 				$("#formTag").submit();
 			});

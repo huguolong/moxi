@@ -16,7 +16,9 @@ import com.moxi.model.ButtReq;
 import com.moxi.service.IApiService;
 import com.moxi.common.config.Constant;
 
+
 import javax.annotation.Resource;
+
 import javax.servlet.http.HttpServletRequest;
 
 @Service
@@ -30,6 +32,7 @@ public class ApiServiceImpl implements IApiService {
 	@Resource
 	private ActivationRecordMapper activationRecordMapper;
 	@Resource
+
 	private ApplicationMapper applicationMapper;
 
 	@Override

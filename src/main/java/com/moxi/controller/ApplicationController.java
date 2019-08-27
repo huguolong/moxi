@@ -36,7 +36,7 @@ import com.moxi.util.PageUtil;
 
 @Controller
 public class ApplicationController {
-	
+
 	@Resource
 	private ApplicationMapper applicationService;
 	@Resource
@@ -195,8 +195,9 @@ public class ApplicationController {
 		//输出
 		model.addAttribute("list", list);
 		model.addAttribute("channels", channels);
-		
+
 		String pageHTML = PageUtil.getPageContent("statisticsManage_{pageCurrent}_{pageSize}_{pageCount}", pageCurrent, pageSize, pageCount);
+
 		model.addAttribute("pageHTML",pageHTML);
 		model.addAttribute("info",info);
 		

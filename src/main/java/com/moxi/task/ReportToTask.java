@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.net.URLEncoder;
 
@@ -32,6 +31,7 @@ public class ReportToTask {
 
     @Autowired
     private AppRecallCache appRecallCache;
+
 
 
     @Async("taskExecutor")
@@ -78,7 +78,6 @@ public class ReportToTask {
                 activation.setIsNotice(Integer.valueOf(Constant.Commons.TWO));
                 activationRecordMapper.updateByResult(activation);
             }
-
         }catch (Exception e) {
             e.printStackTrace();
         }
