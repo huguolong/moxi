@@ -51,6 +51,11 @@ public class ApiController {
 		return apiService.activationNotice(req);
 	}
 
+	@GetMapping("/api/makeUpNoticeApp")
+	public BaseDataResp makeUpNoticeApp(String clickIds)throws Exception{
+		return apiService.makeUpNoticeApp(clickIds);
+	}
+
 
 	public static void main(String[] args) throws Exception{
 		clickReportedBjjb();

@@ -10,5 +10,7 @@ public interface IApiService {
 	BaseDataResp activationNotice(ButtReq req);
 	
 	BaseDataResp clickNotice(ButtReq req, HttpServletRequest request);
+
+	BaseDataResp makeUpNoticeApp(String clickIds)throws Exception;
 	
 }
