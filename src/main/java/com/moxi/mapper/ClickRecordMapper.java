@@ -59,6 +59,25 @@ public interface ClickRecordMapper {
 		"</script>"
 	})
 	List<ClickRecord> list(ClickRecord click);
+
+
+
+	@Results({
+			@Result(property="id",column="id"),
+			@Result(property="appId",column="app_id"),
+			@Result(property="idfa",column="idfa"),
+			@Result(property="ip",column="ip"),
+			@Result(property="ua",column="ua"),
+			@Result(property="callbackAddress",column="callback_address")
+	})
+	@Select({
+			"<script>",
+			"select * from click_record ",
+			"where create_time BETWEEN #{startTime} and #{endTime} ",
+			"and (result is null OR result = ' ')",
+			"</script>"
+	})
+	List<ClickRecord> listByTime(Map param);
 	
 	@Update("UPDATE `click_record` SET `is_activation`=#{isActivation} WHERE `id` = #{id}")
 	int updateByIsActivation(ClickRecord click);

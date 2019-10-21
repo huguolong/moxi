@@ -32,12 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class ApiServiceImpl implements IApiService {
 
-	private final static Logger logger = LoggerFactory.getLogger(ReportToTask.class);
+	private final static Logger logger = LoggerFactory.getLogger(ApiServiceImpl.class);
 
 	@Autowired
-	private ReportToTask reportToTask;
-	@Autowired
 	private AppRecallCache appRecallCache;
+
 	@Resource
 	private ClickRecordMapper clickRecordMapper;
 	@Resource
@@ -188,7 +187,6 @@ public class ApiServiceImpl implements IApiService {
 				activation.setId(activionId);
 				activation.setIsNotice(Integer.valueOf(Constant.Commons.TWO));
 				activationRecordMapper.updateByResult(activation);
-
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
