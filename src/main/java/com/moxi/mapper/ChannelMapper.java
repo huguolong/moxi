@@ -45,8 +45,20 @@ public interface ChannelMapper {
 	List<Channel> list(Channel channel);
 	
 
-	@Select("SELECT * FROM channel WHERE id = #{id};")
+	@Select("SELECT * FROM channel WHERE id = #{id}")
 	Channel findById(Channel channel);
+
+	@Results({
+			@Result(property="id",column="id",id=true),
+			@Result(property="name",column="name"),
+			@Result(property="code",column="code"),
+			@Result(property="status",column="status"),
+			@Result(property="company",column="company"),
+			@Result(property="createTime",column="create_time"),
+			@Result(property="callbackRatio",column="callback_ratio")
+	})
+	@Select("SELECT * FROM channel WHERE code = #{code}")
+	Channel findByCode(Channel channel);
 	
 	@Insert("INSERT INTO `channel` (`name`, `code`, `status`, `company`, `describe`, `create_time`) VALUES (#{name}, #{code}, #{status}, #{company}, #{describe}, #{createTime})")
 	int insert(Channel channel);

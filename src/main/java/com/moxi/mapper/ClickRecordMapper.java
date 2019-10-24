@@ -31,7 +31,8 @@ public interface ClickRecordMapper {
 		 @Result(property="result",column="result"),
 		 @Result(property="callbackAddress",column="callback_address"),
 		 @Result(property="isActivation",column="is_activation"),
-		 @Result(property="createTime",column="create_time")
+		 @Result(property="createTime",column="create_time"),
+			@Result(property="channelCode",column="channel_code")
 	})
 	@Select("select * from click_record where id = #{id}")
 	ClickRecord findById(Integer id);
@@ -86,7 +87,7 @@ public interface ClickRecordMapper {
 	int updateByResult(ClickRecord click);
 
 	@Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
-	@Insert("INSERT INTO `click_record` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result} )")
+	@Insert("INSERT INTO `click_record` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`,`channel_code`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result},#{cCode})")
 	int insert(ClickRecord click);
 
 }

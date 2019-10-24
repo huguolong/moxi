@@ -44,7 +44,7 @@ public class ReportToTask {
             param.put("startTime",CommonUtil.getStartTime());
             param.put("endTime",CommonUtil.getEndTime());
             List<ClickRecord> list = clickRecordMapper.listByTime(param);
-            logger.info("定时更新无上报结果的点击记录任务-记录数为:{}",list.size());
+            logger.info("定时更新无上报结果的点击记录任务-记录数为->:{}",list.size());
             for (ClickRecord cr:list){
                 System.out.println(cr.getAppId());
 
@@ -68,7 +68,7 @@ public class ReportToTask {
             }
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("任务异常-定时更新无上报结果的点击记录任务");
+            logger.error("任务异常-定时更新无上报结果的点击记录任务....");
         }
 
     }

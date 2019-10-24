@@ -69,6 +69,7 @@ public class ApiServiceImpl implements IApiService {
 		clickRecord.setCallbackAddress(req.getCallback());
 		clickRecord.setIsActivation(Integer.valueOf(Constant.Commons.ZERO));
 		clickRecord.setCreateTime(new Date());
+		clickRecord.setChannelCode(req.getCCode());
 		clickRecordMapper.insert(clickRecord);
 		final Integer clickId = clickRecord.getId();
 
@@ -168,7 +169,7 @@ public class ApiServiceImpl implements IApiService {
 			ClickRecord clickRecord = clickRecordMapper.findById(clickId);
 
 			//判断该应用回调率
-			boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(clickRecord.getAppId()));
+			boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(clickRecord.getAppId(),clickRecord.getChannelCode()));
 			if(isCall){
 				if(!StringUtils.isEmpty(clickRecord.getCallbackAddress())){
 					logger.info("通知用户平台-用户已激活callback:{}",clickRecord.getCallbackAddress());
