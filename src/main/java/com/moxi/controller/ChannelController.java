@@ -2,8 +2,10 @@ package com.moxi.controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import com.moxi.cache.AppRecallCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +24,11 @@ import com.moxi.util.PageUtil;
 @Controller
 public class ChannelController {
 	
-	@Autowired
+	@Resource
 	private ChannelMapper channelService;
+
+	@Resource
+	private AppRecallCache appRecallCache;
 	
 	@RequestMapping("/admin/channelManage_{pageCurrent}_{pageSize}_{pageCount}")
 	public String channelManage(Channel channel,@PathVariable Integer pageCurrent,@PathVariable Integer pageSize,@PathVariable Integer pageCount, Model model) {
@@ -80,6 +85,8 @@ public class ChannelController {
 	public String channelEditPost(Model model,Channel channel,HttpSession httpSession) {
 		
 		if(null != channel && null != channel.getId() && channel.getId() != 0){
+			//清除缓存中的回调率
+			appRecallCache.delAppRecall(channel.getCode());
 			channelService.update(channel);
 		} else {
 			channelService.insert(channel);
