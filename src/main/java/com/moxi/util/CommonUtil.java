@@ -42,5 +42,12 @@ public class CommonUtil {
 		LocalDateTime todayEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 		return todayEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
+
+	/**
+	 * 获取当前月份
+	 */
+	public static String getCurrentMonth(){
+		return DateTimeFormatter.ofPattern("yyyy-MM").format(LocalDateTime.now());
+	}
 	
 }

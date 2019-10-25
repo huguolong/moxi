@@ -41,10 +41,7 @@ public class HttpClientUtils {
     }
     
     /** 
-     * HTTP Get 获取内容 
-     * @param url请求的url地址 ?之前的地址 
-     * @param params请求的参数 
-     * @param charset编码格式 
+     * HTTP Get 获取内容
      * @return 页面内容 
      */  
     public static String sendHttpGet(String url, Map<String, Object> params) throws ParseException, UnsupportedEncodingException, IOException{  

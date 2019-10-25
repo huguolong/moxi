@@ -87,7 +87,19 @@ public interface ClickRecordMapper {
 	int updateByResult(ClickRecord click);
 
 	@Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
-	@Insert("INSERT INTO `click_record` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`,`channel_code`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result},#{cCode})")
+	@Insert("INSERT INTO `click_record` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`,`channel_code`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result},#{channelCode})")
 	int insert(ClickRecord click);
 
+	@Select({
+		"<script>",
+		"SELECT timeDay,count(1) AS clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum ",
+		"FROM ( SELECT cr.id,cr.idfa,cr.is_activation,date_format(cr.create_time, '%Y-%m-%d') AS timeDay ",
+		"FROM click_record cr WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
+		") t GROUP BY timeDay ",
+		"UNION All ",
+		"SELECT '总和' as timeDay,count(1) as clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum ",
+		"FROM click_record cr WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
+		"</script>"
+	})
+	List<Map<String,Object>> countAppClickInfo(Map param);
 }

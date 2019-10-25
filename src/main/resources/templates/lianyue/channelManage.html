@@ -90,10 +90,12 @@
 	                                    <thead>
 		                                    <tr>
 		                                    	<th width="10%">ID</th>
-		                                        <th width="15%">名称</th>
-		                                        <th width="15%">编码</th>
-		                                         <th width="15%">所属公司</th>
-		                                        <th width="5%">状态</th>
+		                                        <th width="10%">名称</th>
+		                                        <th width="10%">编码</th>
+												<th width="10%">所属公司</th>
+												<th width="10%">回调率(%)</th>
+												<th width="10%">类型</th>
+		                                        <th width="10%">状态</th>
 		                                        <th width="10%">操作</th>
 		                                    </tr>
 	                                    </thead>
@@ -103,6 +105,11 @@
 										      	<td th:text="${list.name}">Onions</td>
 										      	<td th:text="${list.code}">Onions</td>
 										      	<td th:text="${list.company}">Onions</td>
+												<td th:text="${list.callbackRatio}">Onions</td>
+												<td>
+													<span th:if="${list.type eq '1'}">上游</span>
+													<span th:if="${list.type eq '2'}">下游</span>
+												</td>
 										      	<td>
 										      		<a href="#" th:onclick="'javascript:updateState('+${list.id}+','+${list.status}+');'" title="状态"><i class="" th:class="${list.status} == 1? 'fa fa-arrow-up text-danger' : 'fa fa-arrow-down text-navy'"></i></a>
 										      	</td>

@@ -9,6 +9,7 @@ import com.moxi.mapper.ApplicationMapper;
 import com.moxi.task.ReportToTask;
 import com.moxi.util.HttpClientUtils;
 import com.moxi.util.RecallUtil;
+import com.moxi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +151,9 @@ public class ApiServiceImpl implements IApiService {
 		try {
 			String callback = URLEncoder.encode(String.format(Constant.ReportedUrl.CALL_BACK,clickId,buttReq.getIdfa()),"UTF-8");
 			String url = appInfo.getReqUrl()+appInfo.getReqParam();
+			if(StringUtils.isEmpty(buttReq.getUa())){
+				buttReq.setUa("ua");
+			}
 			url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
 			logger.info("上报应用方激活URL:{}",url);
 			String result = HttpClientUtils.sendHttpsGet(url, null);

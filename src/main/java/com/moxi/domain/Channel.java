@@ -23,6 +23,8 @@ public class Channel extends BaseObject {
 
     private String callbackRatio;
 
+    private String type;
+
 
 
 }

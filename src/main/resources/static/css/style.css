@@ -3495,6 +3495,16 @@ body.body-small .footer.fixed {
   padding: 8px;
   vertical-align: top;
 }
+
+.table > thead > tr {
+  border-top: 1px solid #e7eaec;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > td {
+  border: 1px solid #e7eaec;
+}
+
 /* PANELS */
 .panel.blank-panel {
   background: none;

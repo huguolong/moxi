@@ -27,7 +27,9 @@ public interface ChannelMapper {
 		 @Result(property="code",column="code"),
 		 @Result(property="status",column="status"),
 		 @Result(property="company",column="company"),
-		 @Result(property="createTime",column="create_time")
+		 @Result(property="createTime",column="create_time"),
+			@Result(property="callbackRatio",column="callback_ratio"),
+			@Result(property="type",column="type")
 	})
 	@Select({
 		"<script>",
@@ -43,8 +45,18 @@ public interface ChannelMapper {
 		"</script>"
 	})
 	List<Channel> list(Channel channel);
-	
 
+
+	@Results({
+			@Result(property="id",column="id",id=true),
+			@Result(property="name",column="name"),
+			@Result(property="code",column="code"),
+			@Result(property="status",column="status"),
+			@Result(property="company",column="company"),
+			@Result(property="createTime",column="create_time"),
+			@Result(property="callbackRatio",column="callback_ratio"),
+			@Result(property="type",column="type")
+	})
 	@Select("SELECT * FROM channel WHERE id = #{id}")
 	Channel findById(Channel channel);
 
@@ -60,10 +72,10 @@ public interface ChannelMapper {
 	@Select("SELECT * FROM channel WHERE code = #{code}")
 	Channel findByCode(Channel channel);
 	
-	@Insert("INSERT INTO `channel` (`name`, `code`, `status`, `company`, `describe`, `create_time`) VALUES (#{name}, #{code}, #{status}, #{company}, #{describe}, #{createTime})")
+	@Insert("INSERT INTO `channel` (`name`, `code`, `status`, `company`, `describe`,`callback_ratio`,`type`, `create_time`) VALUES (#{name}, #{code}, #{status}, #{company}, #{describe},${callbackRatio},#{type}, #{createTime})")
 	int insert(Channel channel);
 	
-	@Update("UPDATE `channel` SET `name`=#{name}, `code`= #{code}, `status`=#{status}, `company`=#{company}, `describe`=#{describe} WHERE (`id`=#{id})")
+	@Update("UPDATE `channel` SET `name`=#{name}, `code`= #{code}, `status`=#{status}, `company`=#{company}, `describe`=#{describe},`callback_ratio`=#{callbackRatio},`type`=#{type} WHERE (`id`=#{id})")
 	int update(Channel channel);
 	
 	@Update("UPDATE `channel` SET `status`=#{status} WHERE (`id`=#{id})")

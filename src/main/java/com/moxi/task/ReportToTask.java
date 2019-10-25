@@ -8,12 +8,15 @@ import com.moxi.mapper.ClickRecordMapper;
 import com.moxi.common.config.Constant;
 import com.moxi.util.CommonUtil;
 import com.moxi.util.HttpClientUtils;
+import com.moxi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.util.StringUtils;
+
 import javax.annotation.Resource;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -56,6 +59,9 @@ public class ReportToTask {
 
                 String callback = URLEncoder.encode(String.format(Constant.ReportedUrl.CALL_BACK,cr.getId(),cr.getIdfa()),"UTF-8");
                 String url = appInfo.getReqUrl()+appInfo.getReqParam();
+                if(StringUtils.isEmpty(cr.getUa())){
+                    cr.setUa("ua");
+                }
                 url = String.format(url,cr.getIdfa(),URLEncoder.encode(cr.getUa(),"UTF-8"),cr.getIp(),callback);
                 logger.info("上报应用方激活URL:{}",url);
                 String result = HttpClientUtils.sendHttpsGet(url, null);

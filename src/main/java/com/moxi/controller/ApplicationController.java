@@ -1,5 +1,7 @@
 package com.moxi.controller;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import com.moxi.cache.AppRecallCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -201,6 +204,36 @@ public class ApplicationController {
 		
 		return "lianyue/statisticsManage";
 	}
-	
-	
+
+
+	@RequestMapping("/admin/statisticsDetail")
+	public String statisticsManage(String appId,String month, Model model) {
+
+		if(StringUtils.isEmpty(month)){
+			month = CommonUtil.getCurrentMonth();
+		}
+		Map<String,String> param = new HashMap<>();
+		param.put("appId",appId);
+		param.put("month",month);
+		List<Map<String,Object>> list = clickRecordService.countAppClickInfo(param);
+		for(Map<String,Object> map : list){
+			int activationNum = 0;
+			if(map.containsKey("activationNum")){
+				activationNum = ((BigDecimal) map.get("activationNum")).intValue();
+			}else{
+				map.put("activationNum",activationNum);
+			}
+			long pcClickNum = (Long)map.get("pcClickNum");
+			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
+		}
+
+		//输出
+		model.addAttribute("list", list);
+		model.addAttribute("appId", appId);
+		model.addAttribute("month", month);
+
+		return "lianyue/statisticsDetail";
+	}
+
+
 }
