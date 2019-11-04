@@ -1,19 +1,18 @@
 package com.moxi.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 import com.moxi.cache.AppRecallCache;
+import com.moxi.domain.AppChannel;
+import com.moxi.mapper.AppChannelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.moxi.domain.Channel;
 import com.moxi.mapper.ChannelMapper;
@@ -26,6 +25,8 @@ public class ChannelController {
 	
 	@Resource
 	private ChannelMapper channelService;
+	@Resource
+	private AppChannelMapper appChannelMapper;
 
 	@Resource
 	private AppRecallCache appRecallCache;
@@ -34,10 +35,10 @@ public class ChannelController {
 	public String channelManage(Channel channel,@PathVariable Integer pageCurrent,@PathVariable Integer pageSize,@PathVariable Integer pageCount, Model model) {
 		
 		//判断
-		if(pageSize == 0) pageSize = 10;
-		if(pageCurrent == 0) pageCurrent = 1;
+		if(pageSize == 0){ pageSize = 10;}
+		if(pageCurrent == 0){ pageCurrent = 1;}
 		int rows = channelService.count(channel);
-		if(pageCount == 0) pageCount = rows%pageSize == 0 ? (rows/pageSize) : (rows/pageSize) + 1;
+		if(pageCount == 0){ pageCount = rows%pageSize == 0 ? (rows/pageSize) : (rows/pageSize) + 1;}
 		
 		//查询
 		channel.setStart((pageCurrent - 1)*pageSize);
@@ -58,7 +59,6 @@ public class ChannelController {
 	/**
 	 * 渠道新增、修改跳转
 	 * @param model
-	 * @param newsCategory
 	 * @return
 	 */
 	@GetMapping("/admin/channelEdit")
@@ -76,8 +76,6 @@ public class ChannelController {
 	/**
 	 * 渠道新增、修改提交
 	 * @param model
-	 * @param newsCategory
-	 * @param imageFile
 	 * @param httpSession
 	 * @return
 	 */
@@ -101,5 +99,26 @@ public class ChannelController {
 		channelService.updateStatus(channel);
 		ResObject<Object> object = new ResObject<Object>(Constant.Code01, Constant.Msg01, null, null);
 		return object;
+	}
+
+	@RequestMapping("/admin/appChannel")
+	public String appChannel(int channId,Model model){
+
+		List<Map<String,Object>> list = appChannelMapper.findListById(channId);
+		model.addAttribute("list",list);
+
+		return "lianyue/appChannel";
+	}
+
+	@PostMapping(value = "/admin/updateAcCalRatio")
+	@ResponseBody
+	public String updateAcCalRatio(AppChannel appChannel){
+		appChannelMapper.updateAcCalRatio(appChannel);
+		//清除缓存
+		Map<String,Object> ac = appChannelMapper.findInfoById(appChannel);
+		String code = (String)ac.get("code");
+		String appId = (String)ac.get("app_id");
+		appRecallCache.delAppRecall(code+appId);
+		return "SUCCESS";
 	}
 }

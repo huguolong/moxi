@@ -88,10 +88,13 @@
 		                                    <tr>
 		                                    	<th width="10%">应用ID</th>
 		                                        <th width="10%">应用名称</th>
+												<th width="10%">上游渠道</th>
 		                                        <th width="10%">点击</th>
 		                                        <th width="10%">排重点击</th>
-		                                        <th width="10%">激活</th>
+		                                        <th width="10%">激活总数</th>
+												<th width="10%">实际通知数</th>
 		                                        <th width="10%">转化率</th>
+												<th width="10%">渠道详情</th>
 		                                        <th width="10%">总数详情</th>
 		                                    </tr>
 	                                    </thead>
@@ -99,10 +102,15 @@
 	                                    	<tr th:each="list : ${list}">
 										   		<td th:text="${list.appId}">Onions</td>
 										      	<td th:text="${list.appName}">Onions</td>
+												<th th:text="${list.channelName}"></th>
 										      	<td th:text="${list.clickNum}">Onions</td>
 										      	<td th:text="${list.pcClickNum}">Onions</td>
 										      	<td th:text="${list.activationNum}">Onions</td>
+												<td th:text="${list.noticeNum}">Onions</td>
 										      	<td th:text="${list.conversion}">Onions</td>
+												<td>
+													<a th:href="@{'channelStatisticsDetail?appId='+${list.appId}}" title="点击记录"><i class="fa fa-file-text text-navy"></i></a>
+												</td>
 										      	<td>
 										      		<a th:href="@{'statisticsDetail?appId='+${list.appId}}" title="点击记录"><i class="fa fa-file-text text-navy"></i></a>
 										      	</td>

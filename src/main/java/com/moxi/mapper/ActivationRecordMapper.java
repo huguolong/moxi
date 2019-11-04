@@ -9,18 +9,20 @@ import org.apache.ibatis.annotations.Update;
 
 import com.moxi.domain.ActivationRecord;
 
+import java.util.Map;
+
 @Mapper
 public interface ActivationRecordMapper {
 	
 	@Select({
 		"<script>",
-		"SELECT COUNT(1) ",
+		"SELECT COUNT(1) as activationNum,SUM(if(a.is_notice = 1,1,0)) as noticeNum ",
 		"FROM activation_record a ",
 		"JOIN click_record c ON c.id = a.click_id ",
 		"WHERE c.app_id = #{appId} ",
 		"</script>"
 	})
-	int countActivationNum(String appId);
+	Map<String,Object> countActivationNum(String appId);
 
 	@Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
 	@Insert("INSERT INTO `activation_record` (`click_id`, `req_url`, `req_param`, `result`, `is_notice`, `create_time`) "

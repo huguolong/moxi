@@ -93,10 +93,9 @@
 		                                        <th width="10%">名称</th>
 		                                        <th width="10%">编码</th>
 												<th width="10%">所属公司</th>
-												<th width="10%">回调率(%)</th>
 												<th width="10%">类型</th>
 		                                        <th width="10%">状态</th>
-		                                        <th width="10%">操作</th>
+		                                        <th width="15%">操作</th>
 		                                    </tr>
 	                                    </thead>
 	                                    <tbody>
@@ -105,7 +104,6 @@
 										      	<td th:text="${list.name}">Onions</td>
 										      	<td th:text="${list.code}">Onions</td>
 										      	<td th:text="${list.company}">Onions</td>
-												<td th:text="${list.callbackRatio}">Onions</td>
 												<td>
 													<span th:if="${list.type eq '1'}">上游</span>
 													<span th:if="${list.type eq '2'}">下游</span>
@@ -118,6 +116,7 @@
 										      		&nbsp;&nbsp;
 										      		<a href="#" th:onclick="'javascript:updateState('+${list.id}+',-1);'" title="删除"><i class="fa fa-trash-o text-navy"></i></a>
 										      		&nbsp;&nbsp;
+													<a th:href="@{'appChannel?channId='+${list.id}}" title="">应用</a>
 										      	</td>
 											</tr>
 	                                    </tbody>

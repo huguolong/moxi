@@ -80,5 +80,4 @@ public interface ChannelMapper {
 	
 	@Update("UPDATE `channel` SET `status`=#{status} WHERE (`id`=#{id})")
 	int updateStatus(Channel channel);
-	
 }

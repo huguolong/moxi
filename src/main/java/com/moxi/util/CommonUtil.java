@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class CommonUtil {
 	
-	public static String getPercent(Integer num,Long totalPeople ){
+	public static String getPercent(Long num,Long totalPeople ){
 		String percent ;
 		Double p3 = 0.0;
 		if(totalPeople == 0){

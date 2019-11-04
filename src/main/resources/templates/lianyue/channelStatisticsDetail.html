@@ -35,7 +35,7 @@
 							<strong><a href="statisticsManage_0_0_0">营销统计</a></strong>
 			          	</li>
 						<li class="active">
-							<strong>总数详情</strong>
+							<strong>渠道详情</strong>
 						</li>
 					</ol>
 		      	</div>
@@ -56,7 +56,7 @@
 		                        </div>
 		                    </div>
 		                    <div class="ibox-content" style="display: block;">
-		                    	<form action="statisticsDetail">
+		                    	<form action="channelStatisticsDetail">
 		                        <div class="row">
 	                            	<div class="col-sm-3 m-b-xs">
 
@@ -93,21 +93,37 @@
 	                                    <thead>
 		                                    <tr>
 		                                    	<th width="15%">日期</th>
+												<th width="15%">渠道</th>
 		                                        <th width="15%">点击数</th>
 		                                        <th width="15%">排重点击</th>
-		                                        <th width="15%">激活数</th>
+		                                        <th width="15%">激活总数</th>
 												<th width="15%">实际通知数</th>
 		                                        <th width="15%">转华率</th>
 		                                    </tr>
 	                                    </thead>
 	                                    <tbody>
-	                                    	<tr th:each="list : ${list}">
-										   		<td th:text="${list.timeDay}">Onions</td>
-										      	<td th:text="${list.clickNum}">Onions</td>
-										      	<td th:text="${list.pcClickNum}">Onions</td>
-										      	<td th:text="${list.activationNum}">Onions</td>
-												<td th:text="${list.noticeNum}">Onions</td>
-										      	<td th:text="${list.conversion}">Onions</td>
+	                                    	<tr th:each="data: ${dataList}">
+												<td >
+													<p style="white-space:pre-line;" th:text="${data.timeDay}"></p>
+												</td>
+												<td >
+													<p style="white-space:pre-line;" th:text="${data.channelName}"></p>
+												</td>
+												<td>
+													<p style="white-space:pre-line;" th:text="${data.clickNum}"></p>
+												</td>
+												<td>
+													<p style="white-space:pre-line;" th:text="${data.pcClickNum}"></p>
+												</td>
+												<td>
+													<p style="white-space:pre-line;" th:text="${data.activationNum}"></p>
+												</td>
+												<td>
+													<p style="white-space:pre-line;" th:text="${data.noticeNum}"></p>
+												</td>
+												<td>
+													<p style="white-space:pre-line;" th:text="${data.conversion}"></p>
+												</td>
 											</tr>
 	                                    </tbody>
 	                                </table>

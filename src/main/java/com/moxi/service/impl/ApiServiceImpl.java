@@ -2,9 +2,13 @@ package com.moxi.service.impl;
 
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.moxi.cache.AppRecallCache;
+import com.moxi.domain.AppChannel;
 import com.moxi.domain.AppInfo;
+import com.moxi.mapper.AppChannelMapper;
 import com.moxi.mapper.ApplicationMapper;
 import com.moxi.task.ReportToTask;
 import com.moxi.util.HttpClientUtils;
@@ -43,22 +47,45 @@ public class ApiServiceImpl implements IApiService {
 	@Resource
 	private ActivationRecordMapper activationRecordMapper;
 	@Resource
-
 	private ApplicationMapper applicationMapper;
+	@Resource
+	private AppChannelMapper appChannelMapper;
 
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public BaseDataResp clickNotice(ButtReq req, HttpServletRequest request) {
 		BaseDataResp resp = new BaseDataResp();
+		//查看该渠道对接应用是否启用
+		if(!StringUtil.isNull(req.getCCode())){
+			Map<String,String> param = new HashMap<>();
+			param.put("channelCode",req.getCCode());
+			param.put("appId",req.getAppid());
+			AppChannel appChannel = appChannelMapper.findByCodeAndApp(param);
+			if(null != appChannel){
+				if(appChannel.getStatus() != 1){
+					resp.setCode(Constant.Commons.ERROR_PARAMETER);
+					resp.setDescription("该应用已停止服务！");
+					return resp;
+				}
+			}
+		}
+
 		AppInfo appInfo = new AppInfo();
 		appInfo.setAppId(req.getAppid());
 		//保存点击记录
 		appInfo = applicationMapper.findByAppId(appInfo);
 		if(null == appInfo){
 			resp.setCode(Constant.Commons.ERROR_DATA_NOT);
-			resp.setDescription("data does not exist");
+			resp.setDescription("该应用不存在！");
 			return resp;
 		}
+
+		if(appInfo.getStatus() != 1){
+			resp.setCode(Constant.Commons.ERROR_PARAMETER);
+			resp.setDescription("该应用已停止服务！");
+			return resp;
+		}
+
 		ClickRecord clickRecord = new ClickRecord();
 		clickRecord.setReqUrl(req.getReqUrl());
 		clickRecord.setReqParam(req.getReqParam());

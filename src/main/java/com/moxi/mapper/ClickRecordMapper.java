@@ -92,14 +92,31 @@ public interface ClickRecordMapper {
 
 	@Select({
 		"<script>",
-		"SELECT timeDay,count(1) AS clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum ",
-		"FROM ( SELECT cr.id,cr.idfa,cr.is_activation,date_format(cr.create_time, '%Y-%m-%d') AS timeDay ",
-		"FROM click_record cr WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
+		"SELECT timeDay,count(1) AS clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum,SUM(is_notice) as noticeNum ",
+		"FROM ( SELECT cr.id,cr.idfa,cr.is_activation,date_format(cr.create_time, '%Y-%m-%d') AS timeDay,ar.is_notice ",
+		"FROM click_record cr LEFT JOIN activation_record ar on ar.click_id = cr.id and ar.is_notice = 1 ",
+		"WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
 		") t GROUP BY timeDay ",
 		"UNION All ",
-		"SELECT '总和' as timeDay,count(1) as clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum ",
-		"FROM click_record cr WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
+		"SELECT '总和' as timeDay,count(1) as clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum,SUM(ar.is_notice) as noticeNum ",
+		"FROM click_record cr ",
+		"LEFT JOIN activation_record ar on ar.click_id = cr.id and ar.is_notice = 1 ",
+		"WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} ",
 		"</script>"
 	})
 	List<Map<String,Object>> countAppClickInfo(Map param);
+
+	@Select({
+			"<script>",
+			"SELECT channel_code as channelCode ,(case when c.`name` is not null THEN c.`name` else '未知' end) as channelName,",
+			"timeDay,count(1) AS clickNum,COUNT(DISTINCT idfa) AS pcClickNum,sum(is_activation) AS activationNum,SUM(is_notice) as noticeNum ",
+			"FROM ( SELECT cr.id,cr.idfa,cr.is_activation,cr.channel_code,date_format(cr.create_time, '%Y-%m-%d') AS timeDay,(CASE WHEN ar.is_notice IS NOT NULL THEN ar.is_notice else '0' end) as is_notice ",
+			"FROM click_record cr LEFT JOIN activation_record ar on ar.click_id = cr.id and ar.is_notice = 1 ",
+			"WHERE cr.app_id = #{appId} and date_format(cr.create_time,'%Y-%m') = #{month} order by cr.create_time asc ",
+			") t LEFT JOIN channel c on c.`code` = t.channel_code GROUP BY channel_code,timeDay ",
+			"</script>"
+	})
+	List<Map<String,Object>> countAppClickInfoByChannel(Map param);
+
+
 }

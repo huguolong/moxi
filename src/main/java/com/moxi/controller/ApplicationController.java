@@ -1,6 +1,7 @@
 package com.moxi.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class ApplicationController {
 		List<ClickRecord> list = clickRecordService.list(click);
 		//输出
 		model.addAttribute("list", list);
-		String pageHTML = PageUtil.getPageContent("applicationManage_{pageCurrent}_{pageSize}_{pageCount}", pageCurrent, pageSize, pageCount);
+		String pageHTML = PageUtil.getPageContent("appClickRecord_{pageCurrent}_{pageSize}_{pageCount}", pageCurrent, pageSize, pageCount);
 		model.addAttribute("pageHTML",pageHTML);
 		
 		return "lianyue/clickRecord";
@@ -183,8 +184,14 @@ public class ApplicationController {
 			Map<String,Long> m = clickRecordService.countClickNum(appId);
 			list.get(i).setClickNum(m.get("clickNum"));
 			list.get(i).setPcClickNum(m.get("pcClickNum"));
-			Integer activationNum = activationRecordService.countActivationNum(appId);
-			list.get(i).setActivationNum(activationNum);
+			Map<String,Object> res = activationRecordService.countActivationNum(appId);
+			list.get(i).setActivationNum((long)res.get("activationNum"));
+			if(res.containsKey("noticeNum")){
+				long noticeNum = 0L;
+				noticeNum= ((BigDecimal) res.get("noticeNum")).longValue();
+				list.get(i).setNoticeNum(noticeNum);
+			}
+
 			list.get(i).setConversion(CommonUtil.getPercent(list.get(i).getActivationNum(), list.get(i).getPcClickNum()));
 		}
 		
@@ -217,14 +224,17 @@ public class ApplicationController {
 		param.put("month",month);
 		List<Map<String,Object>> list = clickRecordService.countAppClickInfo(param);
 		for(Map<String,Object> map : list){
-			int activationNum = 0;
+			long activationNum = 0;
 			if(map.containsKey("activationNum")){
-				activationNum = ((BigDecimal) map.get("activationNum")).intValue();
+				activationNum = ((BigDecimal) map.get("activationNum")).longValue();
 			}else{
 				map.put("activationNum",activationNum);
 			}
 			long pcClickNum = (Long)map.get("pcClickNum");
 			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
+			if(!map.containsKey("noticeNum")){
+				map.put("noticeNum","0");
+			}
 		}
 
 		//输出
@@ -234,6 +244,89 @@ public class ApplicationController {
 
 		return "lianyue/statisticsDetail";
 	}
+
+	@RequestMapping("/admin/channelStatisticsDetail")
+	public String channelStatisticsManage(String appId,String month, Model model) {
+
+		if(StringUtils.isEmpty(month)){
+			month = CommonUtil.getCurrentMonth();
+		}
+		Map<String,String> param = new HashMap<>();
+		param.put("appId",appId);
+		param.put("month",month);
+		List<Map<String,Object>> list = clickRecordService.countAppClickInfoByChannel(param);
+		for(Map<String,Object> map : list){
+			long activationNum = 0;
+			if(map.containsKey("activationNum")){
+				activationNum = ((BigDecimal) map.get("activationNum")).longValue();
+			}else{
+				map.put("activationNum",activationNum);
+			}
+			long pcClickNum = (Long)map.get("pcClickNum");
+			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
+			long noticeNum = 0L;
+			if(map.containsKey("noticeNum")){
+				noticeNum = ((Double)map.get("noticeNum")).longValue();
+			}
+			map.put("noticeNum",noticeNum);
+
+		}
+//		Map<String,List<Map<String,Object>>> timeDayMap = new HashMap<>();
+//
+//		for(Map<String,Object> map : list){
+//			String timeDay = (String)map.get("timeDay");
+//			List<Map<String,Object>> data = new ArrayList<>();
+//			if(timeDayMap.containsKey(timeDay)){
+//				data = timeDayMap.get(timeDay);
+//			}
+//
+//			int activationNum = 0;
+//			if(map.containsKey("activationNum")){
+//				activationNum = ((BigDecimal) map.get("activationNum")).intValue();
+//			}else{
+//				map.put("activationNum",activationNum);
+//			}
+//			long pcClickNum = (Long)map.get("pcClickNum");
+//			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
+//
+//			data.add(map);
+//			timeDayMap.put(timeDay,data);
+//		}
+
+//		List<Map<String,Object>> dataList = new ArrayList<>();
+//
+//		for(Map.Entry<String,List<Map<String,Object>>> entry:timeDayMap.entrySet()){
+//			Map<String,Object> map = new HashMap<>();
+//			map.put("timeDay",entry.getKey());
+//			List<Map<String,Object>> data = entry.getValue();
+//			StringBuffer clickNum = new StringBuffer();
+//			StringBuffer pcClickNum = new StringBuffer();
+//			StringBuffer activationNum = new StringBuffer();
+//			StringBuffer conversion = new StringBuffer();
+//			for(Map<String,Object> d : data ){
+//				String channelName = (String) d.get("channelName");
+//				clickNum.append(channelName).append(":").append(d.get("clickNum")).append("\\n");
+//				pcClickNum.append(channelName).append(":").append(d.get("pcClickNum")).append("\\n") ;
+//				activationNum.append(channelName).append(":").append(d.get("activationNum")).append("\\n") ;
+//				conversion.append(channelName).append(":").append(d.get("conversion")).append("\\n") ;
+//			}
+//			map.put("clickNum",clickNum.toString());
+//			map.put("pcClickNum",clickNum.toString());
+//			map.put("activationNum",activationNum.toString());
+//			map.put("conversion",conversion.toString());
+//			dataList.add(map);
+//		}
+
+
+
+		//输出
+		model.addAttribute("dataList", list);
+		model.addAttribute("appId", appId);
+		model.addAttribute("month", month);
+
+		return "lianyue/channelStatisticsDetail";
+	}
+
 
 
 }

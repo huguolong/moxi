@@ -1,7 +1,9 @@
 package com.moxi.cache;
 
+import com.moxi.domain.AppChannel;
 import com.moxi.domain.AppInfo;
 import com.moxi.domain.Channel;
+import com.moxi.mapper.AppChannelMapper;
 import com.moxi.mapper.ApplicationMapper;
 import com.moxi.mapper.ChannelMapper;
 import com.moxi.util.StringUtil;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,21 +23,28 @@ public class AppRecallCache {
     private ApplicationMapper applicationMapper;
     @Resource
     private ChannelMapper channelMapper;
+    @Resource
+    private AppChannelMapper appChannelMapper;
 
     private static Map<String, Integer> caches = new ConcurrentHashMap<String, Integer>();
 
     public int getAppRecall(String appId,String channelCode) {
         int recall = 100;
+
         if(!StringUtils.isEmpty(channelCode)){
-            if (this.isContains(channelCode)) {
-                recall = caches.get(channelCode);
+
+            //渠道与应用之间的缓存 key
+            String acKey = channelCode+appId;
+            if (this.isContains(acKey)) {
+                recall = caches.get(acKey);
             }else{
-                Channel channel = new Channel();
-                channel.setCode(channelCode);
-                channel = channelMapper.findByCode(channel);
-                if(null != channel){
-                    recall = Integer.valueOf(channel.getCallbackRatio());
-                    caches.put(channelCode,recall);
+                Map<String,String> param = new HashMap<>();
+                param.put("channelCode",channelCode);
+                param.put("appId",appId);
+                AppChannel appChannel = appChannelMapper.findByCodeAndApp(param);
+                if(null != appChannel){
+                    recall = Integer.valueOf(appChannel.getCallbackRatio());
+                    caches.put(acKey,recall);
                 }
             }
         }else{
