@@ -1,5 +1,6 @@
 package com.moxi.controller;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import com.moxi.mapper.AdminMapper;
 @Controller
 public class AdminController {
 
-	@Autowired
+	@Resource
 	private AdminMapper adminService;
 
 	/**

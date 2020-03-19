@@ -4,8 +4,10 @@ import java.util.Date;
 
 import com.moxi.model.BaseObject;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class AppInfo extends BaseObject {
     private Integer id;
 

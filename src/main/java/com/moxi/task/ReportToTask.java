@@ -40,7 +40,7 @@ public class ReportToTask {
     private ApplicationMapper applicationMapper;
 
 
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 */2 * * ?")
     public void toAppTask(){
         try {
             HashMap<String,Object> param = new HashMap<>();
