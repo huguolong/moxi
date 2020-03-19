@@ -30,13 +30,12 @@
 
 	<dependencies>
 		
-		<!-- 
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		  -->
+	    </dependency>
 		  
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,11 +108,11 @@
             <artifactId>lombok</artifactId>
             <version>1.18.6</version>
         </dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<!-- 排除Tomcat依赖 -->
+		<!--
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                     排除Tomcat依赖
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -125,6 +124,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-undertow</artifactId>
 		</dependency>
+		 -->
 
     </dependencies>
 
