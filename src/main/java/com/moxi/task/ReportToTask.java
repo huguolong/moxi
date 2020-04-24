@@ -26,8 +26,8 @@ import java.util.List;
  * @author hgl
  */
 @Component
-@Configuration      //1.主要用于标记配置类，兼备Component的效果。
-@EnableScheduling   // 2.开启定时任务
+@Configuration
+@EnableScheduling
 public class ReportToTask {
 
     private final static Logger logger = LoggerFactory.getLogger(ReportToTask.class);
@@ -76,10 +76,5 @@ public class ReportToTask {
             e.printStackTrace();
             logger.error("任务异常-定时更新无上报结果的点击记录任务....");
         }
-
-    }
-
-    public void toUserPlatform(Integer clickId,Integer activionId){
-
     }
 }

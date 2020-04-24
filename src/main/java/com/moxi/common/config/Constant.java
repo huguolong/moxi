@@ -45,7 +45,7 @@ public interface Constant {
 		 */
 		public static String ELEME_CHANNEL_URL = "https://channelcube.ele.me/click/idfa";
 
-		public static String CALL_BACK = "http://www.adlianyue.com/api/jhNotice?click_id=%s&idfa=%s";
+		public static String CALL_BACK = "http://api.adlianyue.com/api/jhNotice?click_id=%s&idfa=%s";
 		
 	}
 }
