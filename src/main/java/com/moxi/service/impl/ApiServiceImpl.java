@@ -177,7 +177,6 @@ public class ApiServiceImpl implements IApiService {
 		//更新点击记录为已激活
 		clickRecord.setIsActivation(Integer.valueOf(Constant.Commons.ONE));
 		clickRecordMapper.updateByIsActivation(clickRecord);
-		clickRecordMapper.updateByIsActivation1(clickRecord);
 		//应用方通知用户已激活后-通知用户平台
 		toUserPlatform(clickId,activationRecord.getId());
 
