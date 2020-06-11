@@ -10,23 +10,18 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 import com.moxi.cache.AppRecallCache;
+import com.moxi.mapper.*;
+import com.moxi.service.IApplicationService;
+import com.moxi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.moxi.domain.AppInfo;
 import com.moxi.domain.Channel;
 import com.moxi.domain.ClickRecord;
-import com.moxi.mapper.ActivationRecordMapper;
-import com.moxi.mapper.ApplicationMapper;
-import com.moxi.mapper.ChannelMapper;
-import com.moxi.mapper.ClickRecordMapper;
 import com.moxi.model.ResObject;
 import com.moxi.util.CommonUtil;
 import com.moxi.common.config.Constant;
@@ -42,13 +37,17 @@ import com.moxi.util.PageUtil;
 public class ApplicationController {
 
 	@Resource
-	private ApplicationMapper applicationService;
+	private ApplicationMapper applicationMapper;
 	@Resource
 	private ChannelMapper channelService;
 	@Resource
 	private ClickRecordMapper clickRecordService;
 	@Resource
 	private ActivationRecordMapper activationRecordService;
+	@Resource
+    private AppStatisticsMapper appStatisticsMapper;
+	@Resource
+    private IApplicationService applicationService;
 
 	@Autowired
 	private AppRecallCache appRecallCache;
@@ -60,13 +59,13 @@ public class ApplicationController {
 		//判断
 		if(pageSize == 0) {pageSize = 10;}
 		if(pageCurrent == 0) {pageCurrent = 1;}
-		int rows = applicationService.count(info);
+		int rows = applicationMapper.count(info);
 		if(pageCount == 0) {pageCount = rows%pageSize == 0 ? (rows/pageSize) : (rows/pageSize) + 1;}
 		
 		//查询
 		info.setStart((pageCurrent - 1)*pageSize);
 		info.setEnd(pageSize);
-		List<AppInfo> list = applicationService.list(info);
+		List<AppInfo> list = applicationMapper.list(info);
 		
 		//渠道
 		Channel channel = new Channel();
@@ -101,7 +100,7 @@ public class ApplicationController {
 		List<Channel> channels = channelService.list(channel);
 		model.addAttribute("channels",channels);
 		if(null != info && null != info.getId() && info.getId() != 0){
-			AppInfo appinfo = applicationService.findById(info);
+			AppInfo appinfo = applicationMapper.findById(info);
 			model.addAttribute("info",appinfo);
 		}else {
 			model.addAttribute("info",new AppInfo());
@@ -120,9 +119,9 @@ public class ApplicationController {
 		if(null != info && null != info.getId() && info.getId() != 0){
 			//清除缓存中的回调率
 			appRecallCache.delAppRecall(info.getAppId());
-			applicationService.update(info);
+            applicationMapper.update(info);
 		} else {
-			applicationService.insert(info);
+            applicationMapper.insert(info);
 		}
 		return "redirect:applicationManage_0_0_0";
 		
@@ -131,7 +130,7 @@ public class ApplicationController {
 	@ResponseBody
 	@PostMapping("/admin/appinfoEditstatus")
 	public ResObject<Object> channelEditstatus(AppInfo info) {
-		applicationService.updateStatus(info);
+        applicationMapper.updateStatus(info);
 		ResObject<Object> object = new ResObject<Object>(Constant.Code01, Constant.Msg01, null, null);
 		return object;
 	}
@@ -171,30 +170,14 @@ public class ApplicationController {
 		//判断
 		if(pageSize == 0) {pageSize = 10;}
 		if(pageCurrent == 0) {pageCurrent = 1;}
-		int rows = applicationService.count(info);
+		int rows = applicationMapper.count(info);
 		if(pageCount == 0) {pageCount = rows%pageSize == 0 ? (rows/pageSize) : (rows/pageSize) + 1;}
 		
 		//查询
 		info.setStart((pageCurrent - 1)*pageSize);
 		info.setEnd(pageSize);
-		List<AppInfo> list = applicationService.list(info);
-		
-		for(int i=0;i<list.size();i++) {
-			String appId = list.get(i).getAppId();
-			Map<String,Long> m = clickRecordService.countClickNum(appId);
-			list.get(i).setClickNum(m.get("clickNum"));
-			list.get(i).setPcClickNum(m.get("pcClickNum"));
-			Map<String,Object> res = activationRecordService.countActivationNum(appId);
-			list.get(i).setActivationNum((long)res.get("activationNum"));
-			if(res.containsKey("noticeNum")){
-				long noticeNum = 0L;
-				noticeNum= ((BigDecimal) res.get("noticeNum")).longValue();
-				list.get(i).setNoticeNum(noticeNum);
-			}
+		List<AppInfo> list = applicationMapper.list(info);
 
-			list.get(i).setConversion(CommonUtil.getPercent(list.get(i).getActivationNum(), list.get(i).getPcClickNum()));
-		}
-		
 		//渠道
 		Channel channel = new Channel();
 		channel.setStart(0);
@@ -222,20 +205,25 @@ public class ApplicationController {
 		Map<String,String> param = new HashMap<>();
 		param.put("appId",appId);
 		param.put("month",month);
-		List<Map<String,Object>> list = clickRecordService.countAppClickInfo(param);
-		for(Map<String,Object> map : list){
-			long activationNum = 0;
-			if(map.containsKey("activationNum")){
-				activationNum = ((BigDecimal) map.get("activationNum")).longValue();
-			}else{
-				map.put("activationNum",activationNum);
-			}
-			long pcClickNum = (Long)map.get("pcClickNum");
-			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
-			if(!map.containsKey("noticeNum")){
-				map.put("noticeNum","0");
-			}
-		}
+		List<Map<String,Object>> list = appStatisticsMapper.getTotalStatistics(param);
+        Map<String,Object> all = new HashMap<>();
+        all.put("timeDay","总和");
+        Long click=0L,pcClick=0L,activation=0L,notice=0L;
+		for (Map<String,Object> map:list){
+            int clickNum = (Integer) map.get("clickNum");
+            int pcClickNum = (Integer) map.get("pcClickNum");
+            int activationNum = (Integer) map.get("activationNum");
+            int noticeNum = (Integer)  map.get("noticeNum");
+            click+=clickNum;
+            pcClick+=pcClickNum;
+            activation+=activationNum;
+            notice+=noticeNum;
+        }
+        all.put("clickNum",click);
+		all.put("pcClickNum",pcClick);
+        all.put("activationNum",activation);
+        all.put("noticeNum",notice);
+        all.put("conversion", CommonUtil.getPercent(activation, pcClick));
 
 		//输出
 		model.addAttribute("list", list);
@@ -254,70 +242,7 @@ public class ApplicationController {
 		Map<String,String> param = new HashMap<>();
 		param.put("appId",appId);
 		param.put("month",month);
-		List<Map<String,Object>> list = clickRecordService.countAppClickInfoByChannel(param);
-		for(Map<String,Object> map : list){
-			long activationNum = 0;
-			if(map.containsKey("activationNum")){
-				activationNum = ((BigDecimal) map.get("activationNum")).longValue();
-			}else{
-				map.put("activationNum",activationNum);
-			}
-			long pcClickNum = (Long)map.get("pcClickNum");
-			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
-			long noticeNum = 0L;
-			if(map.containsKey("noticeNum")){
-				noticeNum = ((Double)map.get("noticeNum")).longValue();
-			}
-			map.put("noticeNum",noticeNum);
-
-		}
-//		Map<String,List<Map<String,Object>>> timeDayMap = new HashMap<>();
-//
-//		for(Map<String,Object> map : list){
-//			String timeDay = (String)map.get("timeDay");
-//			List<Map<String,Object>> data = new ArrayList<>();
-//			if(timeDayMap.containsKey(timeDay)){
-//				data = timeDayMap.get(timeDay);
-//			}
-//
-//			int activationNum = 0;
-//			if(map.containsKey("activationNum")){
-//				activationNum = ((BigDecimal) map.get("activationNum")).intValue();
-//			}else{
-//				map.put("activationNum",activationNum);
-//			}
-//			long pcClickNum = (Long)map.get("pcClickNum");
-//			map.put("conversion",CommonUtil.getPercent(activationNum, pcClickNum));
-//
-//			data.add(map);
-//			timeDayMap.put(timeDay,data);
-//		}
-
-//		List<Map<String,Object>> dataList = new ArrayList<>();
-//
-//		for(Map.Entry<String,List<Map<String,Object>>> entry:timeDayMap.entrySet()){
-//			Map<String,Object> map = new HashMap<>();
-//			map.put("timeDay",entry.getKey());
-//			List<Map<String,Object>> data = entry.getValue();
-//			StringBuffer clickNum = new StringBuffer();
-//			StringBuffer pcClickNum = new StringBuffer();
-//			StringBuffer activationNum = new StringBuffer();
-//			StringBuffer conversion = new StringBuffer();
-//			for(Map<String,Object> d : data ){
-//				String channelName = (String) d.get("channelName");
-//				clickNum.append(channelName).append(":").append(d.get("clickNum")).append("\\n");
-//				pcClickNum.append(channelName).append(":").append(d.get("pcClickNum")).append("\\n") ;
-//				activationNum.append(channelName).append(":").append(d.get("activationNum")).append("\\n") ;
-//				conversion.append(channelName).append(":").append(d.get("conversion")).append("\\n") ;
-//			}
-//			map.put("clickNum",clickNum.toString());
-//			map.put("pcClickNum",clickNum.toString());
-//			map.put("activationNum",activationNum.toString());
-//			map.put("conversion",conversion.toString());
-//			dataList.add(map);
-//		}
-
-
+		List<Map<String,Object>> list = appStatisticsMapper.getChannelStatistics(param);
 
 		//输出
 		model.addAttribute("dataList", list);
@@ -326,6 +251,18 @@ public class ApplicationController {
 
 		return "lianyue/channelStatisticsDetail";
 	}
+
+    @ResponseBody
+    @GetMapping("/application/init")
+    public ResObject<Object> initStatisticsApp(String day) {
+		if(StringUtil.isNull(day)){
+			applicationService.pressAllStatisticsApp();
+		}else{
+			applicationService.pressDayStatisticsApp(day);
+		}
+        ResObject<Object> object = new ResObject<Object>(Constant.Code01, Constant.Msg01, null, null);
+        return object;
+    }
 
 
 

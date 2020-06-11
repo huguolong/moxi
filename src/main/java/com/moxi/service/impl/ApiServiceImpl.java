@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.moxi.cache.AppRecallCache;
 import com.moxi.domain.AppChannel;
 import com.moxi.domain.AppInfo;
@@ -54,6 +55,7 @@ public class ApiServiceImpl implements IApiService {
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public BaseDataResp clickNotice(ButtReq req, HttpServletRequest request) {
+		logger.info("点击请求：{}", JSONObject.toJSON(req));
 		BaseDataResp resp = new BaseDataResp();
 		//查看该渠道对接应用是否启用
 		if(!StringUtil.isNull(req.getCCode())){
@@ -109,11 +111,15 @@ public class ApiServiceImpl implements IApiService {
 
 	@Override
 	public BaseDataResp makeUpNoticeApp(String clickIds) throws Exception{
+		logger.info("手动激活通知请求：{}", clickIds);
 		String[] ids = clickIds.split(",");
 		BaseDataResp resp = new BaseDataResp();
 		if(ids.length>0){
 			for (String clickId:ids ){
 				ClickRecord clickRecord = clickRecordMapper.findById(Integer.valueOf(clickId));
+				if(clickRecord == null){
+					clickRecord = clickRecordMapper.findByIdBack(Integer.valueOf(clickId));
+				}
 				AppInfo appInfo = new AppInfo();
 				appInfo.setAppId(clickRecord.getAppId());
 				//保存点击记录
@@ -137,11 +143,16 @@ public class ApiServiceImpl implements IApiService {
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public BaseDataResp activationNotice(ButtReq req) {
-		
+
+		logger.info("用户激活推广方通知请求：{}", JSONObject.toJSON(req));
+
 		BaseDataResp resp = new BaseDataResp();
 		//接到应用方用户已激活通知后，保存激活记录并修改 点击记录为激活
 		Integer clickId = Integer.parseInt(req.getClick_id());
 		ClickRecord clickRecord = clickRecordMapper.findById(clickId);
+		if(clickRecord == null){
+			clickRecord = clickRecordMapper.findByIdBack(clickId);
+		}
 		if(null == clickRecord){
 			resp.setCode(Constant.Commons.ERROR_DATA_NOT);
 			resp.setDescription("data does not exist");
@@ -166,7 +177,7 @@ public class ApiServiceImpl implements IApiService {
 		//更新点击记录为已激活
 		clickRecord.setIsActivation(Integer.valueOf(Constant.Commons.ONE));
 		clickRecordMapper.updateByIsActivation(clickRecord);
-
+		clickRecordMapper.updateByIsActivation1(clickRecord);
 		//应用方通知用户已激活后-通知用户平台
 		toUserPlatform(clickId,activationRecord.getId());
 
@@ -198,6 +209,9 @@ public class ApiServiceImpl implements IApiService {
 	public void toUserPlatform(Integer clickId,Integer activionId){
 		try {
 			ClickRecord clickRecord = clickRecordMapper.findById(clickId);
+			if(clickRecord == null){
+				clickRecord = clickRecordMapper.findByIdBack(clickId);
+			}
 
 			//判断该应用回调率
 			boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(clickRecord.getAppId(),clickRecord.getChannelCode()));
