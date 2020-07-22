@@ -1,5 +1,6 @@
 package com.moxi.task;
 
+import com.moxi.cache.AppRecallCache;
 import com.moxi.domain.AppInfo;
 import com.moxi.domain.ClickRecord;
 import com.moxi.mapper.ApplicationMapper;
@@ -39,8 +40,10 @@ public class ReportToTask {
     private ApplicationMapper applicationMapper;
     @Resource
     private IApplicationService applicationService;
+    @Resource
+    private AppRecallCache appRecallCache;
 
-    @Scheduled(cron = "0 0 */2 * * ?")
+//    @Scheduled(cron = "0 0 */2 * * ?")
     public void toAppTask(){
 
         if(taskOpen){
@@ -102,8 +105,14 @@ public class ReportToTask {
             String date = CommonUtil.getBeforeDay();
             applicationService.pressDayStatisticsApp(date);
         }
-
     }
+
+    @Scheduled(cron = "0 0/30 * * * ?")
+    public void emptyAppRecallCache(){
+        logger.info("每小时清理缓存值....");
+        appRecallCache.delAppRecallAll();
+    }
+
 
 
 

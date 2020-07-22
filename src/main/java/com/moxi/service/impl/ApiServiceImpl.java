@@ -1,6 +1,8 @@
 package com.moxi.service.impl;
 
 import java.net.URLEncoder;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +13,8 @@ import com.moxi.domain.AppChannel;
 import com.moxi.domain.AppInfo;
 import com.moxi.mapper.AppChannelMapper;
 import com.moxi.mapper.ApplicationMapper;
+import com.moxi.model.RabbitmqMessageVo;
+import com.moxi.mq.RabbitmqSender;
 import com.moxi.task.ReportToTask;
 import com.moxi.util.HttpClientUtils;
 import com.moxi.util.RecallUtil;
@@ -18,6 +22,7 @@ import com.moxi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.moxi.domain.ActivationRecord;
@@ -40,8 +45,10 @@ public class ApiServiceImpl implements IApiService {
 
 	private final static Logger logger = LoggerFactory.getLogger(ApiServiceImpl.class);
 
-	@Autowired
+	@Resource
 	private AppRecallCache appRecallCache;
+	@Resource
+	private RabbitmqSender rabbitmqSender;
 
 	@Resource
 	private ClickRecordMapper clickRecordMapper;
@@ -55,8 +62,10 @@ public class ApiServiceImpl implements IApiService {
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public BaseDataResp clickNotice(ButtReq req, HttpServletRequest request) {
-		logger.info("点击请求：{}", JSONObject.toJSON(req));
+
+		logger.info("点击请求>>> appId:{} >> channelCode:{} >> idfa:{} ", req.getAppid(),req.getCCode(),req.getIdfa());
 		BaseDataResp resp = new BaseDataResp();
+
 		//查看该渠道对接应用是否启用
 		if(!StringUtil.isNull(req.getCCode())){
 			Map<String,String> param = new HashMap<>();
@@ -88,22 +97,23 @@ public class ApiServiceImpl implements IApiService {
 			return resp;
 		}
 
-		ClickRecord clickRecord = new ClickRecord();
-		clickRecord.setReqUrl(req.getReqUrl());
-		clickRecord.setReqParam(req.getReqParam());
-		clickRecord.setAppId(req.getAppid());
-		clickRecord.setChannelId(appInfo.getChannelId());
-		clickRecord.setIdfa(req.getIdfa());
-		clickRecord.setUa(req.getUa());
-		clickRecord.setIp(req.getIp());
-		clickRecord.setCallbackAddress(req.getCallback());
-		clickRecord.setIsActivation(Integer.valueOf(Constant.Commons.ZERO));
-		clickRecord.setCreateTime(new Date());
-		clickRecord.setChannelCode(req.getCCode());
-		clickRecordMapper.insert(clickRecord);
-		final Integer clickId = clickRecord.getId();
+		//加入消息队列
+		RabbitmqMessageVo rabbitmqMessageVo = RabbitmqMessageVo.custom().build();
+		rabbitmqMessageVo.setQueue(rabbitmqSender.getQueueCenter());
+		rabbitmqMessageVo.setDirectExchange(rabbitmqSender.getExchangeName());
+		rabbitmqMessageVo.setRoutingKey(rabbitmqSender.getQueueCenterKey());
+		rabbitmqMessageVo.setTags(req.getAppid()+"|"+req.getCCode()+"|"+req.getIdfa());
+		rabbitmqMessageVo.setData(req);
+		rabbitmqSender.sendNotifyMessage(rabbitmqMessageVo);
+//		//查询是否重复点击
+//		int num = clickRecordMapper.countByIdfa(req.getAppid(),req.getIdfa());
+//		if(num >= 1){
+//			resp.setCode(Constant.Commons.ERROR_DATA_IN);
+//			resp.setDescription("数据已存在-重复点击！");
+//			return resp;
+//		}
 
-		toAppTask(clickId, appInfo, req);
+//		toAppTask(clickId, appInfo, req);
 
 		resp.setCode(Constant.Commons.SUCCESS_CODE);
 		return resp;
@@ -156,12 +166,25 @@ public class ApiServiceImpl implements IApiService {
 		if(null == clickRecord){
 			resp.setCode(Constant.Commons.ERROR_DATA_NOT);
 			resp.setDescription("data does not exist");
+			logger.error("用户激活推广方通知请求-数据库数据不存在：{}",JSONObject.toJSON(req));
+
+			//添加激活记录
+			ActivationRecord activationRecord = new ActivationRecord();
+			activationRecord.setClickId(clickId);
+			activationRecord.setReqUrl(req.getReqUrl());
+			activationRecord.setReqParam(req.getReqParam());
+			activationRecord.setIsNotice(Integer.valueOf(Constant.Commons.ZERO));
+			activationRecord.setCreateTime(new Date());
+			activationRecord.setResult("数据库不存在-点击上报");
+			activationRecordMapper.insert(activationRecord);
+
 			return resp;
 		}
 		ActivationRecord info = activationRecordMapper.findByClickIdOrIdfa(clickId);
 		if(info != null) {
 			resp.setCode(Constant.Commons.ERROR_ACTIVED);
 			resp.setDescription("this idfa has been actived");
+			logger.error("用户激活推广方通知请求-idfa为数据库激活状态：{}",JSONObject.toJSON(req));
 			return resp;
 		}
 
@@ -185,6 +208,8 @@ public class ApiServiceImpl implements IApiService {
 		return resp;
 	}
 
+	@Override
+	@Async("taskExecutor")
 	public void toAppTask(Integer clickId, AppInfo appInfo, ButtReq buttReq){
 		try {
 			String callback = URLEncoder.encode(String.format(Constant.ReportedUrl.CALL_BACK,clickId,buttReq.getIdfa()),"UTF-8");
@@ -192,27 +217,30 @@ public class ApiServiceImpl implements IApiService {
 			if(StringUtils.isEmpty(buttReq.getUa())){
 				buttReq.setUa("ua");
 			}
+			logger.info("上报应用方激活 >> idfa:{} >> url:{} ",buttReq.getIdfa(),url);
 			url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
-			logger.info("上报应用方激活URL:{}",url);
+			Long timeConsuming1 = Duration.between(buttReq.getBeginTime(),LocalDateTime.now()).toMillis();
 			String result = HttpClientUtils.sendHttpsGet(url, null);
-			logger.info("返回结果:{}",result);
+			Long timeConsuming2 = Duration.between(buttReq.getBeginTime(),LocalDateTime.now()).toMillis();
+			logger.info("返回结果:{} ,业务处理耗时：{}ms,上报耗时间：{}ms,总耗时：{}ms",result,timeConsuming1,timeConsuming2-timeConsuming1,timeConsuming2);
 			ClickRecord cr = new ClickRecord();
 			cr.setId(clickId);
 			cr.setResult(result);
 			clickRecordMapper.updateByResult(cr);
+
 		}catch (Exception e) {
 			e.printStackTrace();
 			logger.error("通知异常-上报应用方激活：{}",clickId);
 		}
 	}
 
+	@Async("taskExecutor2")
 	public void toUserPlatform(Integer clickId,Integer activionId){
 		try {
 			ClickRecord clickRecord = clickRecordMapper.findById(clickId);
 			if(clickRecord == null){
 				clickRecord = clickRecordMapper.findByIdBack(clickId);
 			}
-
 			//判断该应用回调率
 			boolean isCall = RecallUtil.isCallback(appRecallCache.getAppRecall(clickRecord.getAppId(),clickRecord.getChannelCode()));
 			if(isCall){

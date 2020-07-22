@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.annotation.sql.DataSourceDefinition;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 对接入参数
@@ -44,4 +45,6 @@ public class ButtReq implements Serializable{
 	private String ip;
 
 	private String cCode;
+
+	private LocalDateTime beginTime;
 }

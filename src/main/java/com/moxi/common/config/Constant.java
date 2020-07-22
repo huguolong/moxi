@@ -18,6 +18,7 @@ public interface Constant {
 		public static final String ERROR_PARAMETER = "0003";	//参数错误
 		public static final String ERROR_ACTIVED = "0004"; 	//已激活
 		public static final String ERROR_DATA_NOT = "0005";	//数据不存在
+		public static final String ERROR_DATA_IN = "0006";	//数据已存在
 		
 		public static final String SUCCESS_DESC = "SUCCESS";
 		

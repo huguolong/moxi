@@ -47,7 +47,7 @@ public class ApplicationServiceImpl implements IApplicationService {
             for(Map<String,Object> map : list){
                 long activationNum = 0;
                 if(map.containsKey("activationNum")){
-                    activationNum = ((BigDecimal) map.get("activationNum")).longValue();
+                    activationNum = (Long) map.get("activationNum");
                 }else{
                     map.put("activationNum",activationNum);
                 }
@@ -68,7 +68,7 @@ public class ApplicationServiceImpl implements IApplicationService {
             for(Map<String,Object> map : totalList){
                 long activationNum = 0;
                 if(map.containsKey("activationNum")){
-                    activationNum = ((BigDecimal) map.get("activationNum")).longValue();
+                    activationNum = (Long) map.get("activationNum");
                 }else{
                     map.put("activationNum",activationNum);
                 }

@@ -26,7 +26,7 @@ public class AppRecallCache {
     @Resource
     private AppChannelMapper appChannelMapper;
 
-    private static Map<String, Integer> caches = new ConcurrentHashMap<String, Integer>();
+    private static Map<String, Integer> caches = new ConcurrentHashMap<>();
 
     public int getAppRecall(String appId,String channelCode) {
         int recall = 100;
@@ -77,5 +77,13 @@ public class AppRecallCache {
      */
     public boolean isContains(String key) {
         return caches.containsKey(key);
+    }
+
+    public void delAppRecallAll(){
+        caches = new ConcurrentHashMap<>();
+    }
+
+    public Map getAppRecal(){
+        return caches;
     }
 }

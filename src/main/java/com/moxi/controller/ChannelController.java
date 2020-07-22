@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import com.moxi.cache.AppRecallCache;
 import com.moxi.domain.AppChannel;
 import com.moxi.mapper.AppChannelMapper;
+import com.moxi.model.BaseDataResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -120,5 +121,13 @@ public class ChannelController {
 		String appId = (String)ac.get("app_id");
 		appRecallCache.delAppRecall(code+appId);
 		return "SUCCESS";
+	}
+
+	@PostMapping(value = "/admin/getAppRecallCache")
+	@ResponseBody
+	public BaseDataResp getAppRecallCache(){
+		BaseDataResp resp = new BaseDataResp();
+		resp.setData(appRecallCache.getAppRecal());
+		return resp;
 	}
 }

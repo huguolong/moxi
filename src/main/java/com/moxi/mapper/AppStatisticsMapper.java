@@ -13,15 +13,15 @@ public interface AppStatisticsMapper {
     /**
      * 添加渠道统计数据
      */
-    @Insert("INSERT INTO app_channel_statistics (`app_id`, `code`, `channelName`, `month`, `timeDay`, `clickNum`, `pcClickNum`, `activationNum`, `noticeNum`, `conversion`, `create_time`) " +
-            "VALUES (#{appId}, #{code}, #{channelName}, #{month}, #{timeDay}, #{clickNum}, #{pcClickNum}, #{activationNum}, #{noticeNum}, #{conversion}, NOW())")
+    @Insert("INSERT INTO app_channel_statistics (`app_id`, `code`, `channelName`, `month`, `timeDay`, `clickNum`, `pcClickNum`, `activationNum`, `noticeNum`, `conversion`) " +
+            "VALUES (#{appId}, #{code}, #{channelName}, #{month}, #{timeDay}, #{clickNum}, #{pcClickNum}, #{activationNum}, #{noticeNum}, #{conversion})")
     int insertChannelStatistics(Map param);
 
     /**
      * 添加数据统计数据
      */
-    @Insert("INSERT INTO app_total_statistics (`app_id`, `month`, `timeDay`, `clickNum`, `pcClickNum`, `activationNum`, `noticeNum`, `conversion`, `create_time`) " +
-            "VALUES (#{appId}, #{month}, #{timeDay}, #{clickNum}, #{pcClickNum}, #{activationNum}, #{noticeNum}, #{conversion}, NOW())")
+    @Insert("INSERT INTO app_total_statistics (`app_id`, `month`, `timeDay`, `clickNum`, `pcClickNum`, `activationNum`, `noticeNum`, `conversion`) " +
+            "VALUES (#{appId}, #{month}, #{timeDay}, #{clickNum}, #{pcClickNum}, #{activationNum}, #{noticeNum}, #{conversion})")
     int insertTotalStatistics(Map param);
 
     /**

@@ -56,7 +56,7 @@ public class HttpClientUtils {
             url +="?"+EntityUtils.toString(new UrlEncodedFormEntity(pairs), CHARSET);  
         }  
         
-        System.out.println("请求URL:" + url);
+//        System.out.println("请求URL:" + url);
         
         HttpGet httpGet = new HttpGet(url);  
         CloseableHttpResponse response = httpclient.execute(httpGet);  
@@ -104,7 +104,7 @@ public class HttpClientUtils {
         CloseableHttpResponse response = null;
         
         
-        System.out.println("请求URL:" + url + sb.toString());
+//        System.out.println("请求URL:" + url + sb.toString());
         
         HttpGet get = new HttpGet(url + sb.toString());
         String result = "";
