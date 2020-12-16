@@ -76,4 +76,8 @@ public class CommonUtil {
 		SimpleDateFormat sp=new SimpleDateFormat(DEFAULT_DATE_FORMAT);
 		return sp.format(d);
 	}
+
+	public static void main(String[] args) {
+		System.out.println(getBeforeDay());
+	}
 }

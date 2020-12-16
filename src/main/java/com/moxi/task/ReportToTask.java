@@ -70,7 +70,10 @@ public class ReportToTask {
                     url = String.format(url,cr.getIdfa(),URLEncoder.encode(cr.getUa(),"UTF-8"),cr.getIp(),callback);
                     logger.info("上报应用方激活URL:{}",url);
                     String result = HttpClientUtils.sendHttpsGet(url, null);
-                    logger.info("返回结果:{}",result);
+                    if(result.length() > 100){
+                        result = result.substring(0,100);
+                        logger.info("返回结果:{}",result);
+                    }
                     ClickRecord clickRecord = new ClickRecord();
                     clickRecord.setId(cr.getId());
                     clickRecord.setResult(result);

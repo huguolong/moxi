@@ -15,6 +15,8 @@ public class ActivationRecord {
 
 	private Integer isNotice;
 
+	private String idfa;
+
 	private Date createTime;
 
 	public Integer getId() {
@@ -57,6 +59,13 @@ public class ActivationRecord {
 		this.result = result;
 	}
 
+	public String getIdfa() {
+		return idfa;
+	}
+
+	public void setIdfa(String idfa) {
+		this.idfa = idfa;
+	}
 
 	public Integer getIsNotice() {
 		return isNotice;

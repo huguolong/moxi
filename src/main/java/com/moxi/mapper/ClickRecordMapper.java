@@ -11,7 +11,7 @@ public interface ClickRecordMapper {
 	
 	@Select(
 		"SELECT COUNT(1) as clickNum, COUNT(DISTINCT idfa) as pcClickNum "+
-		"FROM click_record_2 "+
+		"FROM click_record_3 "+
 		"WHERE app_id = #{appId} and create_time < #{startTime}"
 	)
 	Map<String,Long> countClickNum(@Param("appId")String appId, @Param("startTime")String startTime);
@@ -30,7 +30,7 @@ public interface ClickRecordMapper {
 		 @Result(property="channelCode",column="channel_code")
 	})
 
-	@Select("select * from click_record_2 where id = #{id}")
+	@Select("select * from click_record_3 where id = #{id}")
 	ClickRecord findById(Integer id);
 
 
@@ -48,13 +48,13 @@ public interface ClickRecordMapper {
 			@Result(property="createTime",column="create_time"),
 			@Result(property="channelCode",column="channel_code")
 	})
-	@Select("select * from click_record_0 where id = #{id}")
+	@Select("select * from click_record_2 where id = #{id}")
 	ClickRecord findByIdBack(Integer id);
 
-	@Select("select count(1) from click_record_2 where app_id = #{appId}")
+	@Select("select count(1) from click_record_3 where app_id = #{appId}")
 	int count(String appId);
 
-	@Select("select count(1) from click_record_2 where app_id = #{appId} and idfa = #{idfa}")
+	@Select("select count(1) from click_record_3 where app_id = #{appId} and idfa = #{idfa}")
 	int countByIdfa(@Param("appId") String appId,@Param("idfa") String idfa);
 	
 	@Results({
@@ -71,7 +71,7 @@ public interface ClickRecordMapper {
 	})
 	@Select({
 		"<script>",
-		"SELECT * FROM click_record_2 ",
+		"SELECT * FROM click_record_3 ",
 		"WHERE app_id = #{appId} ",
 		"LIMIT #{start},#{end}",
 		"</script>"
@@ -90,35 +90,35 @@ public interface ClickRecordMapper {
 	})
 	@Select({
 			"<script>",
-			"select * from click_record_2 ",
+			"select * from click_record_3 ",
 			"where create_time BETWEEN #{startTime} and #{endTime} ",
 			"and (result is null OR result = ' ')",
 			"</script>"
 	})
 	List<ClickRecord> listByTime(Map param);
 	
-	@Update("UPDATE `click_record_2` SET `is_activation`=#{isActivation} WHERE `id` = #{id}")
+	@Update("UPDATE `click_record_3` SET `is_activation`=#{isActivation} WHERE `id` = #{id}")
 	int updateByIsActivation(ClickRecord click);
 
-	@Update("UPDATE `click_record_2` SET `result`=#{result} WHERE `id` = #{id}")
+	@Update("UPDATE `click_record_3` SET `result`=#{result} WHERE `id` = #{id}")
 	int updateByResult(ClickRecord click);
 
-	@Update("UPDATE `click_record_0` SET `is_activation`=#{isActivation} WHERE `id` = #{id}")
+	@Update("UPDATE `click_record_2` SET `is_activation`=#{isActivation} WHERE `id` = #{id}")
 	int updateByIsActivation1(ClickRecord click);
 
 	@Options(useGeneratedKeys=true, keyColumn="id")
-	@Insert("INSERT INTO `click_record_2` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`,`channel_code`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result},#{channelCode})")
+	@Insert("INSERT INTO `click_record_3` (`req_url`, `req_param`, `app_id`, `channel_id`, `idfa`, `ua`, `ip`, `callback_address`, `is_activation`, `create_time`, `result`,`channel_code`) VALUES (#{reqUrl}, #{reqParam},#{appId},#{channelId},#{idfa} ,#{ua} ,#{ip} ,#{callbackAddress} ,#{isActivation} ,#{createTime} ,#{result},#{channelCode})")
 	int insert(ClickRecord click);
 
 	@Select({
 		"<script>",
 		"SELECT a.timeDay, a.clickNum, a.pcClickNum, IFNULL(b.activationNum,0) as activationNum, IFNULL(b.noticeNum,0) as noticeNum ",
 		"FROM (SELECT COUNT(1) AS clickNum, COUNT(DISTINCT idfa) AS pcClickNum, date_format(cr.create_time, '%Y-%m-%d') AS timeDay ",
-		"FROM click_record_2 cr WHERE cr.app_id = #{appId} AND date_format(cr.create_time, '%Y-%m-%d') = #{date} GROUP BY timeDay ) a ",
+		"FROM click_record_3 cr WHERE cr.app_id = #{appId} AND date_format(cr.create_time, '%Y-%m-%d') = #{date} GROUP BY timeDay ) a ",
 		"LEFT JOIN ( ",
 		"SELECT t.timeDay, SUM(t.is_activation) AS noticeNum, COUNT(t.is_activation) AS activationNum ",
 		"FROM ( SELECT date_format(ar.create_time, '%Y-%m-%d') AS timeDay,(CASE ar.is_notice WHEN 1 THEN 1 WHEN 2 THEN 0 END ) AS is_activation, ar.is_notice ",
-		"FROM activation_record ar JOIN click_record_2 cr ON cr.id = ar.click_id ",
+		"FROM activation_record ar JOIN click_record_3 cr ON cr.id = ar.click_id and cr.idfa = ar.idfa ",
 		"WHERE cr.app_id = #{appId} AND date_format(ar.create_time, '%Y-%m-%d') = #{date}) t GROUP BY t.timeDay ",
 		") b ON b.timeDay = a.timeDay ",
 		"</script>"
@@ -129,11 +129,12 @@ public interface ClickRecordMapper {
 		"<script>",
 		"SELECT a.code, a.name as channelName,a.timeDay, a.clickNum, a.pcClickNum, IFNULL(b.activationNum,0) as activationNum, IFNULL(b.noticeNum,0) as noticeNum ",
 		"FROM (SELECT c.code, c.name,COUNT(1) AS clickNum, COUNT(DISTINCT idfa) AS pcClickNum, date_format(cr.create_time, '%Y-%m-%d') AS timeDay ",
-		"FROM click_record_2 cr LEFT JOIN channel c on cr.channel_code = c.code WHERE cr.app_id = #{appId} AND date_format(cr.create_time, '%Y-%m-%d') = #{date} GROUP BY c.code,timeDay ) a ",
+		"FROM click_record_3 cr LEFT JOIN channel c on cr.channel_code = c.code WHERE cr.app_id = #{appId} AND date_format(cr.create_time, '%Y-%m-%d') = #{date} GROUP BY c.code,timeDay ) a ",
 		"LEFT JOIN ( ",
 		"SELECT t.code,t.timeDay, SUM(t.is_activation) AS noticeNum, COUNT(t.code) AS activationNum ",
 		"FROM ( SELECT c.code,date_format(ar.create_time, '%Y-%m-%d') AS timeDay,(CASE ar.is_notice WHEN 1 THEN 1 WHEN 2 THEN 0 END ) AS is_activation, ar.is_notice ",
-		"FROM activation_record ar JOIN click_record_2 cr ON cr.id = ar.click_id LEFT JOIN channel c on cr.channel_code = c.code ",
+		"FROM activation_record ar JOIN click_record_3 cr ON cr.id = ar.click_id and cr.idfa = ar.idfa "+
+		"JOIN channel c on cr.channel_code = c.code ",
 		"WHERE cr.app_id = #{appId} AND date_format(ar.create_time, '%Y-%m-%d') = #{date}) t GROUP BY t.code,t.timeDay ",
 		") b ON b.timeDay = a.timeDay and b.code = a.code ORDER BY a.`code`,a.timeDay asc",
 		"</script>"

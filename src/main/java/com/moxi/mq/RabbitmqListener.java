@@ -39,7 +39,7 @@ public class RabbitmqListener {
     @Resource
     private IApiService apiService;
 
-    @RabbitListener(queues = "${mq.queue.center}", containerFactory = "multiListenerContainer")
+    @RabbitListener(queues = "${mq.queue.center}", containerFactory = "singleListenerContainer")
     public void nettyWebsocketMsgQueue(Message message, Channel channel) {
         boolean isSuccess = false;
         try {

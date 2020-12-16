@@ -46,5 +46,7 @@ public class ButtReq implements Serializable{
 
 	private String cCode;
 
+	private String ts;
+
 	private LocalDateTime beginTime;
 }

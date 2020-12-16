@@ -173,6 +173,7 @@ public class ApiServiceImpl implements IApiService {
 			activationRecord.setClickId(clickId);
 			activationRecord.setReqUrl(req.getReqUrl());
 			activationRecord.setReqParam(req.getReqParam());
+			activationRecord.setIdfa(req.getIdfa());
 			activationRecord.setIsNotice(Integer.valueOf(Constant.Commons.ZERO));
 			activationRecord.setCreateTime(new Date());
 			activationRecord.setResult("数据库不存在-点击上报");
@@ -218,9 +219,18 @@ public class ApiServiceImpl implements IApiService {
 				buttReq.setUa("ua");
 			}
 			logger.info("上报应用方激活 >> idfa:{} >> url:{} ",buttReq.getIdfa(),url);
-			url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
+			if(!StringUtil.isNull(buttReq.getTs())){
+				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
+			}else{
+				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
+			}
+
 			Long timeConsuming1 = Duration.between(buttReq.getBeginTime(),LocalDateTime.now()).toMillis();
 			String result = HttpClientUtils.sendHttpsGet(url, null);
+			if(result.length() > 100){
+				result = result.substring(0,100);
+				logger.info("返回结果:{}",result);
+			}
 			Long timeConsuming2 = Duration.between(buttReq.getBeginTime(),LocalDateTime.now()).toMillis();
 			logger.info("返回结果:{} ,业务处理耗时：{}ms,上报耗时间：{}ms,总耗时：{}ms",result,timeConsuming1,timeConsuming2-timeConsuming1,timeConsuming2);
 			ClickRecord cr = new ClickRecord();

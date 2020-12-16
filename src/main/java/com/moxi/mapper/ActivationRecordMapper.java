@@ -17,7 +17,7 @@ public interface ActivationRecordMapper {
 	@Select(
 		"SELECT COUNT(1) as activationNum,SUM(if(a.is_notice = 1,1,0)) as noticeNum "+
 		"FROM activation_record a "+
-		"JOIN click_record_2 c ON c.id = a.click_id "+
+		"JOIN click_record_3 c ON c.id = a.click_id and a.idfa = c.idfa "+
 		"WHERE c.app_id = #{appId} and a.create_time < #{startTime}"
 	)
 	Map<String,Object> countActivationNum(@Param("appId")String appId,@Param("startTime")String startTime);
