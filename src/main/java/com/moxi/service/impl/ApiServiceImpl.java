@@ -3,9 +3,7 @@ package com.moxi.service.impl;
 import java.net.URLEncoder;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONObject;
 import com.moxi.cache.AppRecallCache;
@@ -220,8 +218,15 @@ public class ApiServiceImpl implements IApiService {
 				buttReq.setUa("ua");
 			}
 			logger.info("上报应用方激活 >> idfa:{} >> url:{} ",buttReq.getIdfa(),url);
+
+			String requestId = StringUtil.getOnlyKey();
+
 			if(!StringUtil.isNull(buttReq.getTs())){
 				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
+			}if(!StringUtil.isNull(buttReq.getRqid())){
+				url = String.format(url,requestId,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
+			}if(!StringUtil.isNull(buttReq.getRqid()) && !StringUtil.isNull(buttReq.getTs())){
+				url = String.format(url,requestId,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
 			}else{
 				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
 			}

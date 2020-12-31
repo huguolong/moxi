@@ -110,7 +110,7 @@ public interface ApplicationMapper {
 	})
 	@Select({
 		"<script>",
-		"SELECT A.* FROM application A WHERE A.status > 0 ",
+		"SELECT A.* FROM application A WHERE A.status > 0 order by id desc",
 		"</script>"
 	})
 	List<AppInfo> getAppList();
