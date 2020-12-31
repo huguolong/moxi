@@ -23,8 +23,8 @@ public interface ActivationRecordMapper {
 	Map<String,Object> countActivationNum(@Param("appId")String appId,@Param("startTime")String startTime);
 
 	@Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
-	@Insert("INSERT INTO `activation_record` (`click_id`, `req_url`, `req_param`, `result`, `is_notice`, `create_time`) "
-			+ "VALUES (#{clickId}, #{reqUrl}, #{reqParam}, #{result}, #{isNotice}, #{createTime})")
+	@Insert("INSERT INTO `activation_record` (`click_id`, `req_url`, `req_param`, `idfa` ,`result`, `is_notice`, `create_time`) "
+			+ "VALUES (#{clickId}, #{reqUrl}, #{reqParam},#{idfa}, #{result}, #{isNotice}, #{createTime})")
 	int insert(ActivationRecord info);
 	
 	@Update("UPDATE `activation_record` SET `is_notice` = #{isNotice} WHERE id = #{id}")

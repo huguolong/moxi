@@ -46,6 +46,7 @@ public class ApiController {
 		StringBuffer reqUrl = request.getRequestURL();
 		String reqParam = request.getQueryString();
 		req.setReqUrl(reqUrl.toString());
+		req.setIdfa(request.getParameter("idfa"));
 		req.setReqParam(reqParam);
 
 		return apiService.activationNotice(req);

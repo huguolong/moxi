@@ -195,6 +195,7 @@ public class ApiServiceImpl implements IApiService {
 		activationRecord.setReqUrl(req.getReqUrl());
 		activationRecord.setReqParam(req.getReqParam());
 		activationRecord.setIsNotice(Integer.valueOf(Constant.Commons.ZERO));
+		activationRecord.setIdfa(req.getIdfa());
 		activationRecord.setCreateTime(new Date());
 		activationRecordMapper.insert(activationRecord);
 
