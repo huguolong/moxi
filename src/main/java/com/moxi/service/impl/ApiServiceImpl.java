@@ -221,12 +221,12 @@ public class ApiServiceImpl implements IApiService {
 
 			String requestId = StringUtil.getOnlyKey();
 
-			if(!StringUtil.isNull(buttReq.getTs())){
-				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
-			}if(!StringUtil.isNull(buttReq.getRqid())){
-				url = String.format(url,requestId,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
-			}if(!StringUtil.isNull(buttReq.getRqid()) && !StringUtil.isNull(buttReq.getTs())){
+			if (!StringUtil.isNull(buttReq.getRqid()) && !StringUtil.isNull(buttReq.getTs())){
 				url = String.format(url,requestId,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
+			}else if(!StringUtil.isNull(buttReq.getRqid())){
+				url = String.format(url,requestId,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
+			}else if(!StringUtil.isNull(buttReq.getTs())){
+				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback,System.currentTimeMillis());
 			}else{
 				url = String.format(url,buttReq.getIdfa(),URLEncoder.encode(buttReq.getUa(),"UTF-8"),buttReq.getIp(),callback);
 			}
