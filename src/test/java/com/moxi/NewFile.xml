@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+
+	<!-- 设置数据库驱动文件 -->
+<classPathEntry location="F:\work\workspace1\droprecycle\WebContent\WEB-INF\lib\mysql-connector-java-5.1.18.jar"/>
+
+  <context id="context1" targetRuntime="MyBatis3">
+  	<!-- 避免生成注解 -->
+  	<commentGenerator>
+  		<property name="suppressAllComments" value="true" />
+	</commentGenerator>
+	<!-- 数据库连接信息 -->
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://101.200.38.242:33006/lianyue" userId="root" password="123456" />
+    <!--不生成 BigDecimal -->
+    <javaTypeResolver>
+		<property name="forceBigDecimals" value="false" />  
+	</javaTypeResolver>
+	<!-- Model文件保存位置 -->
+    <javaModelGenerator targetPackage="com.moxi.model" targetProject="moxi-master" />
+    <!-- 生成的查询条件的类 -->
+    <sqlMapGenerator targetPackage="com.moxi.mapper" targetProject="moxi-master" />
+ 	<!-- 生成的mapper文件 -->
+    <javaClientGenerator targetPackage="com.moxi.mapper" targetProject="moxi-master" type="XMLMAPPER" />
+    <!-- 需要连接的表 -->
+    <table tableName="activation_record"  enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false">
+    </table> 
+  </context>
+</generatorConfiguration>

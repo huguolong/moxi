@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <property name="spring.application.name" value="moxi"/>
+
+    <!-- 日志默认输出路径 -->
+    <property name="default_log_path" value="/opt/springboot/log/${spring.application.name}/" />
+    <!-- 日志路径 -->
+    <property name="LOG_PATH" value="${LOG_PATH:-${default_log_path}}"/>
+
+    <!-- 日志名称 -->
+    <property name="LOG_FILE" value="${LOG_FILE:-${spring.application.name}}"/>
+
+    <!-- 日志级别-->
+    <property name="ROOT_LEVEL" value="INFO"/>
+
+    <jmxConfigurator/>
+
+    <!-- 控制台 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>%white(%d{yyyy-MM-dd HH:mm:ss}) %(${spring.application.name}) %highlight(%lsn) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{10}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+      %p:输出优先级，即DEBUG,INFO,WARN,ERROR,FATAL
+      %r:输出自应用启动到输出该日志讯息所耗费的毫秒数
+      %t:输出产生该日志事件的线程名
+      %f:输出日志讯息所属的类别的类别名
+      %c:输出日志讯息所属的类的全名
+      %d:输出日志时间点的日期或时间，指定格式的方式： %d{yyyy-MM-dd HH:mm:ss}
+      %l:输出日志事件的发生位置，即输出日志讯息的语句在他所在类别的第几行。
+      %m:输出代码中指定的讯息，如log(message)中的message
+      %n:输出一个换行符号
+    -->
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
+    <property name="pattern" value="%d{yyyyMMdd:HH:mm:ss.SSS} %(${spring.application.name}) [%thread] %-5level %logger{10}  %msg%n"/>
+
+
+    <!--按天生成WARN日志-->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 只匹配WARN的日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE}.warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}.warn.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <!--            <providers>-->
+            <pattern>${pattern}
+                <!--                    <pattern>-->
+                <!--                        {-->
+                <!--                        "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",-->
+                <!--                        "application_name": "${spring.application.name}",-->
+                <!--                        "level": "%level",-->
+                <!--                        "thread": "%thread",-->
+                <!--                        "class": "%logger{20}",-->
+                <!--                        "msg": "%msg",-->
+                <!--                        "stack_trace": "%exception{5}"-->
+                <!--                        }-->
+                <!--                    </pattern>-->
+            </pattern>
+            <!--            </providers>-->
+        </encoder>
+    </appender>
+
+
+    <!--按天生成INFO日志-->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 只匹配INFO的日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE}.info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}.info.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <!--            <providers>-->
+            <!--                <pattern>-->
+            <pattern>${pattern}
+                <!--                        {-->
+                <!--                        "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",-->
+                <!--                        "application_name": "${spring.application.name}",-->
+                <!--                        "level": "%level",-->
+                <!--                        "thread": "%thread",-->
+                <!--                        "class": "%logger{20}",-->
+                <!--                        "msg": "%msg",-->
+                <!--                        "stack_trace": "%exception{5}"-->
+                <!--                        }-->
+            </pattern>
+            <!--                </pattern>-->
+            <!--            </providers>-->
+        </encoder>
+    </appender>
+
+    <!--按天生成ERROR日志-->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 只匹配INFO的日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE}.error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}.error.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <!--            <providers>-->
+            <!--                <pattern>-->
+            <pattern>${pattern}
+                <!--                        {-->
+                <!--                        "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",-->
+                <!--                        "application_name": "${spring.application.name}",-->
+                <!--                        "level": "%level",-->
+                <!--                        "thread": "%thread",-->
+                <!--                        "class": "%logger{20}",-->
+                <!--                        "msg": "%msg",-->
+                <!--                        "stack_trace": "%exception{5}"-->
+                <!--                        }-->
+            </pattern>
+            <!--                </pattern>-->
+            <!--            </providers>-->
+        </encoder>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <appender-ref ref="INFO"/>
+    </appender>
+
+    <!-- 注册-发现服务的客户端，不打印info日志，否则垃圾日志太多，影响日志阅读 -->
+    <logger level="ERROR" name="com.netflix.discovery.DiscoveryClient" additivity="false">
+        <appender-ref ref="ASYNC" />
+        <appender-ref ref="ERROR" />
+    </logger>
+
+    <root level="${ROOT_LEVEL}">
+        <appender-ref ref="ASYNC"/>
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="WARN"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
