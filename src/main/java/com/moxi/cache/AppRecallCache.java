@@ -2,12 +2,9 @@ package com.moxi.cache;
 
 import com.moxi.domain.AppChannel;
 import com.moxi.domain.AppInfo;
-import com.moxi.domain.Channel;
 import com.moxi.mapper.AppChannelMapper;
 import com.moxi.mapper.ApplicationMapper;
 import com.moxi.mapper.ChannelMapper;
-import com.moxi.util.StringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
